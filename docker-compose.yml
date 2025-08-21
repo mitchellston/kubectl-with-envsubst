@@ -1,0 +1,4 @@
+services:
+  test:
+    image: ubuntu:latest
+    command: sleep infinity

@@ -27,11 +27,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Install packages
+        run: |
+          apt-get update
+          apt-get install -y jq curl
+
       - name: Get correct semvers
         id: versioning
         run: |
+          dig=$(docker image inspect bitnami/kubectl:latest | jq -r '.[].RepoDigests[]' | awk -F@ '{print $2}')
           latest_version=$(curl -s 'https://hub.docker.com/v2/repositories/bitnami/kubectl/tags' -H 'Content-Type: application/json' | jq -r '.results[] | select(.digest == "'$dig'") | .name')
-            echo "::set-output name=latest_version::$latest_version"
+            echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
 
       - name: Test
         run: |
