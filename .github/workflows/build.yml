@@ -36,8 +36,7 @@ jobs:
         id: versioning
         run: |
           docker pull bitnami/kubectl:latest
-          dig=$(docker image inspect bitnami/kubectl:latest | jq -r '.[].RepoDigests[]' | awk -F@ '{print $2}')
-          latest_version=$(curl -s 'https://hub.docker.com/v2/repositories/bitnami/kubectl/tags' -H 'Content-Type: application/json' | jq -r '.results[] | select(.digest == "'$dig'") | .name')
+          latest_version=$(docker image inspect bitnami/kubectl:latest --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
             echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
 
       - name: Test
