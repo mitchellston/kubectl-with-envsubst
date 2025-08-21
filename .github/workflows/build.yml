@@ -45,8 +45,17 @@ jobs:
         run: |
           echo ${{ steps.versioning.outputs.latest_version }}
 
+      - name: Check if version is already published
+        run: |
+          exists=$(curl -s -o /dev/null -w "%{http_code}" https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}/tags/${{ steps.versioning.outputs.latest_version }})
+          echo "exists=$exists" >> $GITHUB_OUTPUT
+          if [ $exists -eq 200 ]; then
+            echo "Version already exists"
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@v5
+        if: steps.versioning.outputs.exists != '200'
         with:
           context: .
           platforms: linux/amd64,linux/arm64
