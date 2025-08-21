@@ -7,7 +7,7 @@ ARG TARGETPLATFORM
 USER root
 
 RUN apt update; \
-  apt install -y curl; \
+  apt install -y curl gettext-base; \
   if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     curl -LO https://github.com/hashmap-kz/kubectl-envsubst/releases/latest/download/kubectl-envsubst_linux_amd64.deb; \
     dpkg -i kubectl-envsubst_linux_amd64.deb; \
