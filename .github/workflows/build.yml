@@ -1,4 +1,4 @@
-name: Publisher
+name: Publish automated
 
 on:
   push:
