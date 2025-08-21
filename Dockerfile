@@ -3,6 +3,7 @@ ARG TARGETPLATFORM
 
 FROM bitnami/kubectl:${VERSION}
 
+ARG TARGETPLATFORM
 USER root
 
 RUN apt update; \
