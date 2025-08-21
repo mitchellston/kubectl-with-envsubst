@@ -42,6 +42,7 @@ jobs:
       - name: Test
         run: |
           echo ${{ steps.versioning.outputs.latest_version }}
+          echo ${{ env.DOCKERHUB_IMAGE }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -52,4 +53,5 @@ jobs:
           build-args: |
             VERSION=${{ steps.versioning.outputs.latest_version }}
           tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_version }}
