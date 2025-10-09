@@ -1,24 +1,19 @@
 ARG VERSION=latest
 ARG TARGETPLATFORM
 
-FROM bitnami/kubectl:latest
+FROM bitnami/kubectl:${VERSION}
 
 ARG TARGETPLATFORM
 USER root
 
-RUN apt update; \
-  apt install -y curl gettext-base; \
-  if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-    curl -LO https://github.com/hashmap-kz/kubectl-envsubst/releases/latest/download/kubectl-envsubst_linux_amd64.deb; \
-    dpkg -i kubectl-envsubst_linux_amd64.deb; \
-    rm kubectl-envsubst_linux_amd64.deb; \
-  elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-    curl -LO https://github.com/hashmap-kz/kubectl-envsubst/releases/latest/download/kubectl-envsubst_linux_arm64.deb; \
-    dpkg -i kubectl-envsubst_linux_arm64.deb; \
-    rm kubectl-envsubst_linux_arm64.deb; \
-  fi; \
-  apt remove -y curl; \
-  apt autoremove -y; \
-  rm -rf /var/lib/apt/lists/*
+RUN tdnf install curl gettext; \
+  # Install kubectl-envsubst
+  OS="$(uname | tr '[:upper:]' '[:lower:]')"; \
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')"; \
+  TAG="$(curl -s https://api.github.com/repos/hashmap-kz/kubectl-envsubst/releases/latest | jq -r .tag_name)"; \
+  curl -L "https://github.com/hashmap-kz/kubectl-envsubst/releases/download/${TAG}/kubectl-envsubst_${TAG}_${OS}_${ARCH}.tar.gz" | tar -xzf - -C /usr/local/bin && chmod +x /usr/local/bin/kubectl-envsubst; \
+  # Cleanup
+  tdnf erase curl -y; \
+  tdnf clean all
 
 USER 1001

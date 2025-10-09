@@ -40,15 +40,18 @@ jobs:
           docker pull bitnami/kubectl:latest
           latest_version=$(docker image inspect bitnami/kubectl:latest --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
             echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
+          latest_sha=$(docker image inspect bitnami/kubectl:latest --format '{{ index .Id }}' | sed 's/sha256:/sha256-/')
+            echo "latest_sha=$latest_sha" >> $GITHUB_OUTPUT
 
       - name: Test data
         run: |
           echo ${{ steps.versioning.outputs.latest_version }}
+          echo ${{ steps.versioning.outputs.latest_sha }}
 
       - name: Check if version is already published
         id: check
         run: |
-          exists=$(curl -s -o /dev/null -w "%{http_code}" https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}/tags/${{ steps.versioning.outputs.latest_version }})
+          exists=$(curl -s -o /dev/null -w "%{http_code}" https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}/tags/${{ steps.versioning.outputs.latest_sha }})
           echo "exists=$exists" >> $GITHUB_OUTPUT
           if [ $exists -eq 200 ]; then
             echo "Version already exists"
@@ -64,5 +67,6 @@ jobs:
           build-args: |
             VERSION=${{ steps.versioning.outputs.latest_version }}
           tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_version }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:latest
