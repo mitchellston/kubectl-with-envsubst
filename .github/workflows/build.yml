@@ -37,13 +37,13 @@ jobs:
       - name: Get image metadata
         id: versioning
         run: |
-          docker pull bitnami/kubectl:latest
-          latest_version=$(docker image inspect bitnami/kubectl:latest --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
+          docker pull bitnamisecure/kubectl:latest
+          latest_version=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
             echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
-          latest_sha=$(docker image inspect bitnami/kubectl:latest --format '{{ index .Id }}' | sed 's/sha256:/sha256-/')
+          latest_sha=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .Id }}' | sed 's/sha256:/sha256-/')
             echo "latest_sha=$latest_sha" >> $GITHUB_OUTPUT
 
-      - name: Test data
+      - name: Test image metadata
         run: |
           echo ${{ steps.versioning.outputs.latest_version }}
           echo ${{ steps.versioning.outputs.latest_sha }}
