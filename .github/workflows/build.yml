@@ -41,7 +41,7 @@ jobs:
           docker image inspect bitnamisecure/kubectl:latest
           latest_version=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
             echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
-          latest_sha=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .Id }}' | sed 's/sha256:/sha256-/')
+          latest_sha=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .RepoDigests 0}}' | sed 's/[^:]*:/sha256-/')
             echo "latest_sha=$latest_sha" >> $GITHUB_OUTPUT
 
       - name: Test image metadata
