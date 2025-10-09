@@ -65,8 +65,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          build-args: |
-            VERSION=${{ steps.versioning.outputs.latest_sha }}
+          # build-args: |
+          #   VERSION=${{ steps.versioning.outputs.latest_sha }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_version }}
