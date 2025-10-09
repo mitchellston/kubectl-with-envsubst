@@ -38,6 +38,7 @@ jobs:
         id: versioning
         run: |
           docker pull bitnamisecure/kubectl:latest
+          docker image inspect bitnamisecure/kubectl:latest
           latest_version=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
             echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
           latest_sha=$(docker image inspect bitnamisecure/kubectl:latest --format '{{ index .Id }}' | sed 's/sha256:/sha256-/')
