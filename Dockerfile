@@ -1,7 +1,7 @@
 ARG VERSION=latest
 ARG TARGETPLATFORM
 
-FROM bitnami/kubectl:${VERSION}
+FROM bitnami/kubectl:latest
 
 ARG TARGETPLATFORM
 USER root
