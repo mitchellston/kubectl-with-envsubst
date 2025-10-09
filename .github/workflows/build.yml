@@ -34,7 +34,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq curl
 
-      - name: Get correct semvers
+      - name: Get image metadata
         id: versioning
         run: |
           docker pull bitnami/kubectl:latest
@@ -65,7 +65,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            VERSION=${{ steps.versioning.outputs.latest_version }}
+            VERSION=${{ steps.versioning.outputs.latest_sha }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_version }}

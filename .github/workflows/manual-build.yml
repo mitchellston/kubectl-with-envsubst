@@ -29,6 +29,25 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Get image metadata
+        id: versioning
+        run: |
+          docker pull bitnami/kubectl:${{ github.event.inputs.version }}
+          latest_version=$(docker image inspect bitnami/kubectl:${{ github.event.inputs.version }} --format '{{ index .Config.Labels "org.opencontainers.image.version"}}')
+            echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
+          latest_sha=$(docker image inspect bitnami/kubectl:${{ github.event.inputs.version }} --format '{{ index .Id }}' | sed 's/sha256:/sha256-/')
+            echo "latest_sha=$latest_sha" >> $GITHUB_OUTPUT
+
+      - name: Test image metadata
+        run: |
+          echo ${{ steps.versioning.outputs.latest_version }}
+          echo ${{ steps.versioning.outputs.latest_sha }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -36,6 +55,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            VERSION=${{ github.event.inputs.version }}
+            VERSION=${{ steps.versioning.outputs.latest_sha }}
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ github.event.inputs.version }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE }}:${{ steps.versioning.outputs.latest_version }}
